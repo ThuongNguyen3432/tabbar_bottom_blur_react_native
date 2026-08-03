@@ -82,17 +82,36 @@ Kịch bản cuộn được script hoá để mọi lần chạy giống hệt 
 | Thiết bị | API | Backend | Trạng thái |
 |---|---|---|---|
 | AVD `Pixel_6a_64G` | 34 | NoBlur, RenderEffect, ExpoBlur | sẵn sàng |
-| AVD mới | 30 | NoBlur, ExpoBlur | **phải tải system image ~1–2 GB** |
-| Máy Android thật đời thấp | chưa rõ | tất cả | **chưa có — xem Câu hỏi mở** |
+| AVD API 30 (tạo mới) | 30 | NoBlur, ExpoBlur | image `system-images;android-30;google_apis;arm64-v8a` đang tải |
+
+API 30 là bản cao nhất **không có** `RenderEffect`, nên nó là mốc chuẩn để xác định ranh giới năng lực. Ghép với API 34 là đủ hai điểm để thấy rõ ranh giới đó.
+
+## Phạm vi đo: chỉ emulator
+
+Đã chốt: spike chạy hoàn toàn trên emulator, không có máy Android thật.
+
+Điều này thu hẹp câu hỏi spike trả lời được. Ghi rõ ra đây để sau này đọc lại không nhầm số liệu emulator thành số liệu sản phẩm.
+
+**Trả lời được chắc chắn** (không phụ thuộc phần cứng):
+- Backend nào **build và chạy được** trên RN 0.86 + New Architecture
+- Backend nào **có blur thật** ở API nào — `RenderEffect` không tồn tại dưới API 31, đây là ranh giới năng lực của hệ điều hành nên đúng trên mọi máy
+- Hiệu ứng **trông ra sao**: độ dày blur, viền, hiện tượng nhoè mép khi cuộn
+- `expo-blur` trên API 31+ có thực sự đi qua `RenderEffect` hay vẫn giả lập — xác minh bằng cách đọc code native của thư viện, không suy đoán
+
+**Chỉ trả lời được theo hướng tương đối:**
+- Tỉ lệ frame time giữa các backend trên cùng emulator. Dùng để xếp hạng, không dùng làm con số tuyệt đối.
+
+**Không trả lời được:**
+- Blur giả lập có đủ nhanh trên máy quét kho thật không. Emulator dùng GPU của máy Mac, mạnh hơn nhiều lần. Số đo sẽ đẹp giả tạo.
 
 ## Tiêu chí thành công
 
-Spike xong khi có một bảng số liệu cho phép trả lời dứt khoát một trong hai:
+Spike xong khi có bảng kết quả cho phép kết luận:
 
-- "Blur dùng được từ API `<X>` trở lên, dưới mức đó dùng scrim mờ thay thế", hoặc
-- "Blur không dùng được trên tập thiết bị mục tiêu"
+- Backend nào dùng được, từ API nào, và trông thế nào — **kết luận cuối cùng**
+- Xếp hạng chi phí tương đối giữa các backend trên emulator — **kết luận sơ bộ, cần máy thật xác nhận**
 
-Kèm theo: kết luận về việc `expo-blur` trên API 31+ có thực sự đi qua `RenderEffect` hay không — điều này **chưa được xác minh**, sẽ đọc code native của thư viện chứ không suy đoán.
+Việc chốt `minSdk` cho sản phẩm **nằm ngoài phạm vi** vì thiếu số liệu máy thật. Nếu sau này có máy thật, chỉ cần chạy lại `scripts/measure.sh` trên nó là đủ — spike đã dựng sẵn toàn bộ công cụ đo.
 
 ## Rủi ro
 
@@ -102,6 +121,4 @@ Kèm theo: kết luận về việc `expo-blur` trên API 31+ có thực sự đ
 
 ## Câu hỏi mở
 
-**Có máy Android thật đời thấp để cắm đo không, và nó chạy Android mấy?**
-
-Chưa có câu trả lời. Không có máy thật thì spike vẫn chạy được nhưng kết luận dừng ở mức "trên emulator thì thế này" và **không chốt được `minSdk`** — tức là không đạt tiêu chí thành công ở trên.
+Không còn. Câu hỏi về máy thật đã được chốt: **chạy emulator**, và hệ quả của lựa chọn đó đã ghi ở mục "Phạm vi đo".
