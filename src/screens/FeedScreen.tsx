@@ -1,6 +1,12 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import {
+  DrawerActions,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
+
+import { useAppTheme } from '../theme';
 
 import { AppBottomSheet } from '../sheet/AppBottomSheet';
 import type { AppSheetRef } from '../sheet/types';
@@ -42,6 +48,8 @@ export function FeedScreen() {
   // Taken from the route rather than a prop, so each tab can point straight at
   // this component instead of an inline wrapper that remounts on every render.
   const title = useRoute().name;
+  const { colors, typography } = useAppTheme();
+  const navigation = useNavigation();
   const rows = useMemo(() => buildRows(title), [title]);
   const tabBarHeight = TAB_BAR_BOTTOM_OFFSET + TAB_BAR_HEIGHT;
 
@@ -55,7 +63,7 @@ export function FeedScreen() {
   }, []);
 
   return (
-    <View style={styles.screen}>
+    <View style={[styles.screen, { backgroundColor: colors.background }]}>
       <FlatList
         data={rows}
         keyExtractor={row => row.key}
@@ -66,14 +74,30 @@ export function FeedScreen() {
           { paddingBottom: tabBarHeight + 24 },
         ]}
         ListHeaderComponent={
-          <Pressable
-            style={styles.listSheetButton}
-            onPress={() => listSheet.current?.open()}
-          >
-            <Text style={styles.listSheetButtonText}>
-              Open list sheet ({rows.length} items)
-            </Text>
-          </Pressable>
+          <View style={styles.headerRow}>
+            <Pressable
+              style={[styles.menuButton, { backgroundColor: colors.surface }]}
+              onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+              accessibilityRole="button"
+              accessibilityLabel="Mở menu"
+            >
+              {/* Three bars, drawn rather than pulled from an icon font. */}
+              <View style={[styles.bar, { backgroundColor: colors.text }]} />
+              <View style={[styles.bar, { backgroundColor: colors.text }]} />
+              <View style={[styles.bar, { backgroundColor: colors.text }]} />
+            </Pressable>
+
+            <Pressable
+              style={[styles.listSheetButton, { backgroundColor: colors.primary }]}
+              onPress={() => listSheet.current?.open()}
+            >
+              <Text
+                style={[styles.listSheetButtonText, { color: colors.textOnPrimary }]}
+              >
+                Open list sheet ({rows.length} items)
+              </Text>
+            </Pressable>
+          </View>
         }
         renderItem={({ item }) => (
           <Pressable
@@ -90,7 +114,9 @@ export function FeedScreen() {
         <View
           style={[styles.swatch, { backgroundColor: selected?.color ?? '#000' }]}
         />
-        <Text style={styles.detailText}>{selected?.color}</Text>
+        <Text style={[typography.body, { color: colors.textMuted, marginTop: 12 }]}>
+          {selected?.color}
+        </Text>
       </AppBottomSheet>
 
       {/* Long content: grows to the ceiling, then scrolls inside the sheet. */}
@@ -102,7 +128,7 @@ export function FeedScreen() {
         renderItem={({ item }) => (
           <View style={styles.sheetRow}>
             <View style={[styles.dot, { backgroundColor: item.color }]} />
-            <Text style={styles.sheetRowText}>{item.label}</Text>
+            <Text style={[typography.body, { color: colors.text }]}>{item.label}</Text>
           </View>
         )}
       />
@@ -130,12 +156,30 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
   },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 16,
+  },
+  menuButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+  },
+  bar: {
+    width: 18,
+    height: 2,
+    borderRadius: 1,
+  },
   listSheetButton: {
-    backgroundColor: '#1c1c1e',
+    flex: 1,
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: 'center',
-    marginBottom: 16,
   },
   listSheetButtonText: {
     color: '#ffffff',

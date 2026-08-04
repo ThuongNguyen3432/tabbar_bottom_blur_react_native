@@ -6,73 +6,49 @@
  */
 
 import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar, StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { FeedScreen } from './src/screens/FeedScreen';
-import { AnimatedTabIcon } from './src/tabbar/AnimatedTabIcon';
-import { BlurTabBar } from './src/tabbar/BlurTabBar';
-import type { IconName } from './src/tabbar/TabBarIcon';
+import { MainNavigator } from './src/app/navigation/MainNavigator';
+import { ThemeProvider } from './src/app/providers/ThemeProvider';
+import { useAppTheme } from './src/theme';
 
-const Tab = createBottomTabNavigator();
+/**
+ * Split from App so it sits *inside* ThemeProvider — the status bar and the
+ * navigators both need the resolved theme, and a component cannot read a
+ * context that it provides itself.
+ */
+function Root() {
+  const theme = useAppTheme();
 
-const ACTIVE_COLOR = '#ff2d55';
-const INACTIVE_COLOR = '#4a4a4f';
-
-const TABS: { name: string; icon: IconName }[] = [
-  { name: 'Home', icon: 'home' },
-  { name: 'Saved', icon: 'heart' },
-  { name: 'Add', icon: 'plus' },
-  { name: 'Search', icon: 'search' },
-  { name: 'People', icon: 'people' },
-];
-
-function Tabs() {
   return (
-    <Tab.Navigator
-      tabBar={props => <BlurTabBar {...props} />}
-      screenOptions={{
-        headerShown: false,
-        // Bottom tabs default to 'none' — screens snap between tabs with no
-        // transition at all. 'shift' slides the outgoing screen out while the
-        // incoming one slides in, which also keeps content moving under the
-        // tab bar so the blur is visibly recomputing mid-transition.
-        animation: 'shift',
-        tabBarActiveTintColor: ACTIVE_COLOR,
-        tabBarInactiveTintColor: INACTIVE_COLOR,
-      }}
-    >
-      {TABS.map(tab => (
-        <Tab.Screen
-          key={tab.name}
-          name={tab.name}
-          component={FeedScreen}
-          options={{
-            tabBarIcon: ({ color, focused }) => (
-              <AnimatedTabIcon name={tab.icon} color={color} focused={focused} />
-            ),
-          }}
-        />
-      ))}
-    </Tab.Navigator>
+    <>
+      <StatusBar
+        barStyle={theme.isDark ? 'light-content' : 'dark-content'}
+        backgroundColor="transparent"
+        translucent
+      />
+      <BottomSheetModalProvider>
+        <NavigationContainer>
+          <MainNavigator />
+        </NavigationContainer>
+      </BottomSheetModalProvider>
+    </>
   );
 }
 
 function App() {
   return (
     // GestureHandlerRootView has to be the outermost view, and needs flex: 1 —
-    // without it the sheet's drag gestures never reach the handler.
+    // without it neither the sheet's drag nor the drawer's swipe reaches the
+    // gesture handler.
     <GestureHandlerRootView style={styles.root}>
       <SafeAreaProvider>
-        <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
-        <BottomSheetModalProvider>
-          <NavigationContainer>
-            <Tabs />
-          </NavigationContainer>
-        </BottomSheetModalProvider>
+        <ThemeProvider>
+          <Root />
+        </ThemeProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

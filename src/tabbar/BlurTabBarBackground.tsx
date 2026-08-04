@@ -1,6 +1,8 @@
 import { StyleSheet } from 'react-native';
 import { BlurView } from '@react-native-community/blur';
 
+import { useAppTheme } from '../theme';
+
 /**
  * The tab bar's translucent backdrop.
  *
@@ -12,13 +14,18 @@ import { BlurView } from '@react-native-community/blur';
  * On iOS it maps to UIVisualEffectView.
  */
 export function BlurTabBarBackground() {
+  const { colors, isDark } = useAppTheme();
+
   return (
     <BlurView
-      blurType="light"
+      blurType={colors.blurTint}
       blurAmount={14}
-      // Android draws a scrim under the blur; the library's default for
-      // blurType="light" is heavy enough to wash the colours out.
-      overlayColor="rgba(255, 255, 255, 0.25)"
+      // Android draws a scrim under the blur, and the library's default is
+      // heavy enough to wash the colours out — so it is set explicitly per
+      // palette rather than left to the default.
+      overlayColor={
+        isDark ? 'rgba(20, 20, 22, 0.35)' : 'rgba(255, 255, 255, 0.25)'
+      }
       style={StyleSheet.absoluteFill}
     />
   );

@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
-import { StyleSheet, useWindowDimensions } from 'react-native';
+import { useWindowDimensions } from 'react-native';
 
+import { useAppTheme } from '../theme';
 import { SheetBlurBackdrop } from './SheetBlurBackdrop';
 
 /** How much of the screen a sheet may grow to before it starts scrolling. */
@@ -27,6 +28,7 @@ export const SHEET_CONTENT_BOTTOM_PADDING = 24;
  */
 export function useSheetChrome(maxHeightRatio: number = MAX_HEIGHT_RATIO) {
   const { height } = useWindowDimensions();
+  const { colors, radius } = useAppTheme();
 
   return useMemo(
     () => ({
@@ -34,21 +36,13 @@ export function useSheetChrome(maxHeightRatio: number = MAX_HEIGHT_RATIO) {
       // content. This only stops tall content from covering the whole screen.
       maxDynamicContentSize: height * maxHeightRatio,
       backdropComponent: SheetBlurBackdrop,
-      handleIndicatorStyle: styles.handleIndicator,
-      backgroundStyle: styles.background,
+      handleIndicatorStyle: { backgroundColor: colors.border, width: 40 },
+      backgroundStyle: {
+        backgroundColor: colors.surfaceElevated,
+        borderRadius: radius.lg,
+      },
       enablePanDownToClose: true,
     }),
-    [height, maxHeightRatio],
+    [height, maxHeightRatio, colors, radius],
   );
 }
-
-const styles = StyleSheet.create({
-  background: {
-    backgroundColor: '#ffffff',
-    borderRadius: 24,
-  },
-  handleIndicator: {
-    backgroundColor: '#c7c7cc',
-    width: 40,
-  },
-});

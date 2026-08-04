@@ -22,9 +22,18 @@ export type MainTabParamList = {
   Profile: { userId?: string } | undefined;
 };
 
+/**
+ * The drawer sits between the root stack and the tabs: it wraps the whole tab
+ * bar, so opening it slides the tabs aside rather than replacing a tab.
+ */
+export type MainDrawerParamList = {
+  Tabs: NavigatorScreenParams<MainTabParamList>;
+  About: undefined;
+};
+
 export type RootStackParamList = {
   Auth: NavigatorScreenParams<AuthStackParamList>;
-  Main: NavigatorScreenParams<MainTabParamList>;
+  Main: NavigatorScreenParams<MainDrawerParamList>;
 };
 
 /**
