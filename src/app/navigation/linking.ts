@@ -1,6 +1,6 @@
 import type { LinkingOptions } from '@react-navigation/native';
 
-import type { MainDrawerParamList } from './navigation.types';
+import type { RootStackParamList } from './navigation.types';
 
 /**
  * Deep links.
@@ -9,24 +9,35 @@ import type { MainDrawerParamList } from './navigation.types';
  * React Navigation matches one level of config per level of navigator, and a
  * config that describes a navigator which is not mounted resolves nothing.
  *
- * App.tsx mounts MainNavigator directly, so the drawer is the root here. Once
- * RootNavigator is mounted instead, this needs an outer Auth/Main level to
- * match it again.
+ * App.tsx mounts RootNavigator, so the outer Auth/Main level is required — a
+ * config describing a navigator that is not mounted matches nothing, which is
+ * how a deep link silently lands on the default screen instead.
  */
-export const linking: LinkingOptions<MainDrawerParamList> = {
+export const linking: LinkingOptions<RootStackParamList> = {
   prefixes: ['tabbarblurlab://', 'https://example.com'],
   config: {
     screens: {
-      Tabs: {
+      Auth: {
         screens: {
-          Home: 'home',
-          Saved: 'saved',
-          Add: 'add',
-          Search: 'search',
-          Profile: 'profile/:userId?',
+          Login: 'login',
+          Register: 'register',
+          ForgotPassword: 'forgot-password',
         },
       },
-      About: 'about',
+      Main: {
+        screens: {
+          Tabs: {
+            screens: {
+              Home: 'home',
+              Saved: 'saved',
+              Add: 'add',
+              Search: 'search',
+              Profile: 'profile/:userId?',
+            },
+          },
+          About: 'about',
+        },
+      },
     },
   },
 };

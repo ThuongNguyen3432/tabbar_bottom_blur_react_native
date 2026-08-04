@@ -1,7 +1,7 @@
 import { ActivityIndicator, Pressable, StyleSheet, type PressableProps } from 'react-native';
 
-import { useAppTheme } from '../../theme';
-import { AppText } from '../AppText';
+import { useAppTheme } from '../theme';
+import { AppText } from './AppText';
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger';
 

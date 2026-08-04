@@ -5,7 +5,10 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { AuthStackParamList } from '../../../app/navigation/navigation.types';
+import { useAppDispatch } from '../../../app/hooks';
+import { toast } from '../../../components/AppToast';
 import { useAppTheme } from '../../../theme';
+import { signedIn } from '../redux/authSlice';
 import { loginSchema } from '../validation';
 
 /** Fields and submit only — the network call belongs to useLoginMutation. */
@@ -15,6 +18,7 @@ export function LoginScreen() {
   // Typed to this stack: the global RootParamList makes the untyped hook
   // resolve to the root navigator, which has no Register screen.
   const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
+  const dispatch = useAppDispatch();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -34,7 +38,11 @@ export function LoginScreen() {
       return;
     }
     setErrors({});
-    // Submit with useLoginMutation once an API is reachable.
+
+    // No backend is configured yet. Signing in locally keeps the template
+    // runnable; swap this for useLoginMutation once an API exists.
+    dispatch(signedIn({ id: 'local', email: parsed.data.email, name: 'Local user' }));
+    toast.success('Đã đăng nhập', parsed.data.email);
   };
 
   const field = {

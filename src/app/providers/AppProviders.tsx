@@ -6,6 +6,10 @@ import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StyleSheet } from 'react-native';
 
+// Imported for its side effect: i18next.init() runs at module load, and
+// without it useTranslation returns an uninitialised instance whose
+// changeLanguage is undefined.
+import '../../i18n';
 import { persistor, store } from '../store';
 import { LanguageProvider } from './LanguageProvider';
 import { NetworkProvider } from './NetworkProvider';
