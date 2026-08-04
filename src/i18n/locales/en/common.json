@@ -1,0 +1,22 @@
+{
+  "appName": "TabbarBlurLab",
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "retry": "Retry",
+    "close": "Close",
+    "back": "Back"
+  },
+  "states": {
+    "loading": "Loading…",
+    "empty": "Nothing here yet",
+    "offline": "No connection"
+  },
+  "settings": {
+    "title": "Settings",
+    "appearance": "APPEARANCE",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "Follow system"
+  }
+}

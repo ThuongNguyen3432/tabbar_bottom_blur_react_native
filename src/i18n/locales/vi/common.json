@@ -1,0 +1,22 @@
+{
+  "appName": "TabbarBlurLab",
+  "actions": {
+    "save": "Lưu",
+    "cancel": "Huỷ",
+    "retry": "Thử lại",
+    "close": "Đóng",
+    "back": "Quay lại"
+  },
+  "states": {
+    "loading": "Đang tải…",
+    "empty": "Chưa có gì ở đây",
+    "offline": "Không có kết nối"
+  },
+  "settings": {
+    "title": "Cài đặt",
+    "appearance": "GIAO DIỆN",
+    "light": "Sáng",
+    "dark": "Tối",
+    "system": "Theo hệ thống"
+  }
+}

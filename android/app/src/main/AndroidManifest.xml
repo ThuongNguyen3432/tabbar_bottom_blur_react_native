@@ -22,6 +22,26 @@
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
+
+        <!-- Custom scheme: tabbarblurlab://home -->
+        <intent-filter>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="tabbarblurlab" />
+        </intent-filter>
+
+        <!--
+          https://example.com/home. autoVerify asks Android to check
+          /.well-known/assetlinks.json on that host; until it is served, the
+          link opens a chooser rather than the app.
+        -->
+        <intent-filter android:autoVerify="true">
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="https" android:host="example.com" />
+        </intent-filter>
       </activity>
     </application>
 </manifest>

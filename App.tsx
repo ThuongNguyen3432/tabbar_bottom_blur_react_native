@@ -11,6 +11,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { linking } from './src/app/navigation/linking';
 import { MainNavigator } from './src/app/navigation/MainNavigator';
 import { ThemeProvider } from './src/app/providers/ThemeProvider';
 import { useAppTheme } from './src/theme';
@@ -31,7 +32,7 @@ function Root() {
         translucent
       />
       <BottomSheetModalProvider>
-        <NavigationContainer>
+        <NavigationContainer linking={linking}>
           <MainNavigator />
         </NavigationContainer>
       </BottomSheetModalProvider>

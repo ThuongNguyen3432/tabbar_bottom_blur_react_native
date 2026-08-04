@@ -1,0 +1,6 @@
+{
+  "required": "Trường này bắt buộc",
+  "email": "Email không hợp lệ",
+  "minLength": "Cần ít nhất {{count}} ký tự",
+  "passwordWeak": "Cần ít nhất 8 ký tự, có cả chữ và số"
+}
