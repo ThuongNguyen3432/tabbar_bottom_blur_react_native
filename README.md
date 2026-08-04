@@ -1,97 +1,122 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# tabbar_bottom_blur_react_native
 
-# Getting Started
+React Native 0.86 template with a floating tab bar that really blurs on both
+platforms, and a bottom sheet that sizes itself to its content.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+Built on the New Architecture, without Expo.
 
-## Step 1: Start Metro
+## Use it as a template
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+```bash
+git clone git@github.com:ThuongNguyen3432/tabbar_bottom_blur_react_native.git my-app
+cd my-app
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+npm run rename -- "My App" com.acme.myapp
 
-```sh
-# Using npm
+npm install
+cd ios && pod install && cd ..
+```
+
+Rename before installing anything. The script moves the Android package
+directory and the iOS project, so pods and build folders generated beforehand
+would point at paths that no longer exist.
+
+Check what it will do first:
+
+```bash
+npm run rename -- "My App" com.acme.myapp --dry-run
+```
+
+It rewrites, on both platforms:
+
+| | Android | iOS |
+|---|---|---|
+| Display name | `strings.xml` → `app_name` | `Info.plist` → `CFBundleDisplayName` |
+| Project name | `settings.gradle` → `rootProject.name` | `.xcodeproj`, `.xcworkspace`, scheme |
+| Bundle id | `namespace`, `applicationId` | `PRODUCT_BUNDLE_IDENTIFIER` |
+| Sources | package directory + `package` declarations | `AppDelegate.swift`, `Podfile` target |
+
+Plus `app.json` and `package.json`.
+
+Two details a search-and-replace would miss, and this handles: the Android
+package lives in the **directory path**, not just in the source; and the stock
+iOS bundle id is derived from `PRODUCT_NAME` behind an
+`org.reactjs.native.example` prefix, so it is pinned to the id you pass rather
+than left to interpolate.
+
+Display names may contain spaces. The Xcode target and Gradle project name
+cannot, so they are derived by stripping everything that is not a letter or
+digit — `"My App"` gives target `MyApp`.
+
+If the working tree is a clean git repository the script uses `git mv`, so file
+history follows the rename.
+
+## Run
+
+```bash
 npm start
-
-# OR using Yarn
-yarn start
+npm run android      # or: npm run ios
 ```
 
-## Step 2: Build and run your app
+### If port 8081 is taken
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+Another project's Metro on 8081 will serve your app the wrong bundle, which
+surfaces as `'NativeMicrotasksCxx' could not be found` rather than anything
+about ports. Use another port:
 
-### Android
-
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
+```bash
+npm start -- --port 8082
+npm run android -- --port 8082 --no-packager
 ```
 
-### iOS
+React Native 0.86 ships a prebuilt core, so the `RCT_METRO_PORT` compile-time
+macro no longer takes effect on iOS. `AppDelegate.swift` sets the location
+directly instead — see the `jsLocation` line, and delete it once 8081 is free.
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+## What is in here
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
+```
+src/
+├── app/          store, providers, navigation, bootstrap
+├── components/   shared UI
+├── core/         api client, storage, logging, network
+├── features/     one folder per feature, each self-contained
+├── theme/        colours, typography, spacing
+├── i18n/         locales
+├── hooks/  utils/  types/  constants/  config/
 ```
 
-Then, and every time you update your native dependencies, run:
+### Blur
 
-```sh
-bundle exec pod install
-```
+`@react-native-community/blur`, not `expo-blur`. Both wrap the same Dimezis
+BlurView on Android so the blur is real either way, but expo's iOS sources need
+a newer Swift than Xcode 26.1.1 provides. It also binds to the activity's
+content view, so nothing has to thread a blur target down from the screens.
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+### Tab bar
 
-```sh
-# Using npm
-npm run ios
+A custom `tabBar`, not the stock one with `tabBarStyle` overrides.
+`BottomTabItem` lays its icon out from the top of the item, and no style option
+reaches the view that decides that — icons cannot be centred any other way.
 
-# OR using Yarn
-yarn ios
-```
+Offsets are flat numbers, not safe-area insets: measured on device, that inset
+is 34pt on iPhone against **0** on Android, so anchoring to it produces visibly
+different spacing.
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+### Bottom sheet
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+`@gorhom/bottom-sheet`. One component covers both plain content and lists.
 
-## Step 3: Modify your app
+Only lists compute their own height. Dynamic sizing measures the content, while
+virtualisation exists precisely to avoid rendering it — with both enabled the
+sheet opens at the right height but the list will not scroll. Lists therefore
+derive their height from `data.length`; pass `rowHeight` if your rows are not
+about 45pt.
 
-Now that you have successfully run the app, let's make changes!
+`BottomSheetFlashList` is deprecated in v5 and does not hand scrolling to
+FlashList v2; `useBottomSheetScrollableCreator` is used instead.
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+## Verified on
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+- Android — Pixel 6a emulator, API 34
+- iOS — iPhone 16e simulator, iOS 26.1
