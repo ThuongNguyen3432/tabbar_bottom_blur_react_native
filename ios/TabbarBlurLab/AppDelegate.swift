@@ -40,9 +40,14 @@ class ReactNativeDelegate: RCTDefaultReactNativeFactoryDelegate {
 
   override func bundleURL() -> URL? {
 #if DEBUG
-    RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
+    // Port 8081 is taken by another project's Metro on this machine. React
+    // Native 0.86 ships a prebuilt core, so the RCT_METRO_PORT compile-time
+    // macro can no longer be overridden at build time — set the location here
+    // instead. Drop this line once 8081 is free.
+    RCTBundleURLProvider.sharedSettings().jsLocation = "localhost:8082"
+    return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
 #else
-    Bundle.main.url(forResource: "main", withExtension: "jsbundle")
+    return Bundle.main.url(forResource: "main", withExtension: "jsbundle")
 #endif
   }
 }
