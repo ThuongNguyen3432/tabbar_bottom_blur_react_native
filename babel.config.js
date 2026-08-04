@@ -1,11 +1,5 @@
 module.exports = {
-  presets: [
-    ['module:@react-native/babel-preset', { jsxImportSource: 'nativewind' }],
-    // NativeWind's preset rewrites className into styles. It is a preset rather
-    // than a plugin, and presets run after plugins, which is what its transform
-    // expects.
-    'nativewind/babel',
-  ],
+  presets: ['module:@react-native/babel-preset'],
   plugins: [
     // zod 4 ships `export * as core from …`, which React Native's preset does
     // not transform — Metro fails the bundle with "Export namespace should be
