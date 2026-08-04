@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * The palettes, as channel triplets so Tailwind's <alpha-value> works.
+ * Values match src/theme/colors — change both or they drift.
+ */
+@layer base {
+  :root {
+    --color-background: 242 242 247;
+    --color-surface: 255 255 255;
+    --color-border: 209 209 214;
+    --color-text: 28 28 30;
+    --color-text-muted: 108 108 112;
+    --color-primary: 255 45 85;
+    --color-danger: 255 59 48;
+  }
+
+  .dark:root {
+    --color-background: 0 0 0;
+    --color-surface: 28 28 30;
+    --color-border: 56 56 58;
+    --color-text: 255 255 255;
+    --color-text-muted: 142 142 147;
+    --color-primary: 255 45 85;
+    --color-danger: 255 59 48;
+  }
+}

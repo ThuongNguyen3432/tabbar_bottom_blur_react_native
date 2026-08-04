@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useColorScheme } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { colorScheme } from 'nativewind';
 
 import { DEFAULT_THEME_MODE, type ThemeMode } from '../../constants/app';
 import { STORAGE_KEYS } from '../../constants/storageKeys';
@@ -52,6 +53,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     setModeState(next);
     AsyncStorage.setItem(STORAGE_KEYS.themeMode, next).catch(() => {});
   }, []);
+
+  // NativeWind keeps its own colour scheme, which drives Tailwind's `dark:`
+  // variant and therefore every Gluestack component. Nothing syncs it to this
+  // provider, so a theme switch would repaint the hand-written components and
+  // leave the Gluestack ones on the old palette.
+  useEffect(() => {
+    colorScheme.set(mode);
+  }, [mode]);
 
   const value = useMemo<ThemeContextValue>(() => {
     // useColorScheme can also report null or 'unspecified' — on a device that
